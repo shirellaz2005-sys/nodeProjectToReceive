@@ -1,5 +1,6 @@
 import Task from "../models/task.model.js";
 import { isValidObjectId } from "mongoose";
+import { AppError } from "../middleware/AppError.js";
 
 export const getAlltasks = async (req, res, next) => {
     try {
@@ -9,7 +10,7 @@ export const getAlltasks = async (req, res, next) => {
             data: tasks
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+       next(error)
     }
 };
 
@@ -18,18 +19,18 @@ export const getTaskById = async (req, res, next) => {
         const { id } = req.params;
         
         if (!isValidObjectId(id)) {
-            return res.status(404).json({ success: false, message: 'Task not found' });
+           return next(new AppError('Task not found',404));
         }
 
         const task = await Task.findById(id).populate('categoryId');
         
         if (!task) {
-            return res.status(404).json({ success: false, message: "Task not found" });
+          return next(new AppError('Task not found',404));
         }
 
         res.status(200).json({ success: true, data: task });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+       next(error);
     }
 };
 
@@ -43,7 +44,7 @@ export const createTask = async (req, res, next) => {
             data: savedTask
         });
     } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
+      next(error)
     }
 };
 
@@ -52,7 +53,7 @@ export const updateTask = async (req, res, next) => {
         const { id } = req.params;
 
         if (!isValidObjectId(id)) {
-            return res.status(404).json({ success: false, message: "Task not found" });
+           return next(new AppError('task not found',404));
         }
 
         const updatedTask = await Task.findByIdAndUpdate(
@@ -62,12 +63,12 @@ export const updateTask = async (req, res, next) => {
         );
 
         if (!updatedTask) {
-            return res.status(404).json({ success: false, message: 'Task not found' });
+          return next(new AppError('Task not found', 404)); 
         }
 
         res.status(200).json({ success: true, data: updatedTask });
     } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
+        next(error)
     }
 };
 
@@ -76,13 +77,13 @@ export const deleteTask = async (req, res, next) => {
         const { id } = req.params;
 
         if (!isValidObjectId(id)) {
-            return res.status(404).json({ success: false, message: 'Task not found' });
+         return next(new AppError('Task not found', 404));
         }
 
         const deletedTask = await Task.findByIdAndDelete(id);
 
         if (!deletedTask) {
-            return res.status(404).json({ success: false, message: 'Task not found' });
+          return next(new AppError('Task not found', 404));
         }
 
         res.status(200).json({
@@ -90,6 +91,6 @@ export const deleteTask = async (req, res, next) => {
             message: 'Task deleted successfully'
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+       next(error);
     }
 };
