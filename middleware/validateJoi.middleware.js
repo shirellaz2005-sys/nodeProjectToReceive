@@ -1,4 +1,4 @@
-import { AppError } from "./AppError";
+import { AppError } from "./AppError.js";
 export const validateSchema = (schema) => {
     const mdl = (req, res, next) => {
         const { error, value } = schema.validate(req.body);
