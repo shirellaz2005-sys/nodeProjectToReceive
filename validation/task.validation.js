@@ -1,8 +1,9 @@
-import joi from 'joi';
-export const taskValidationSchema=joi.object({
-    title:joi.string().required().min(5).max(100),
-    description:joi.string().allow('',null),
-    isCompleted:joi.boolean(),
-    duDate:joi.date().allow(null),
-    categoryId:joi.string().required()
+import Joi from "joi";
+
+export const taskValidationSchema = Joi.object({
+    title: Joi.string().trim().required().min(5).max(100),
+    description: Joi.string().trim().allow("", null),
+    isCompleted: Joi.boolean(),
+    dueDate: Joi.date().allow(null),
+    categoryId: Joi.string().hex().length(24).allow(null),
 });
