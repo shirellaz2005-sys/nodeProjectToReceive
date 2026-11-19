@@ -4,10 +4,10 @@ import {
     createCategory 
 } from '../controllers/category.controller.js';
 import { validateSchema } from '../middleware/validateJoi.middleware.js';
-import categorySchema from '../models/category.model.js'
+import { categoryValidationSchema } from "../validation/category.validation.js";
 const router = Router();
 
 router.get('/', getCategories);       
-router.post('/', validateSchema(categorySchema),createCategory);     
+router.post('/', validateSchema(categoryValidationSchema),createCategory);     
 
 export default router;
