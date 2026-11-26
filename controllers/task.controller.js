@@ -2,9 +2,11 @@ import Task from "../models/task.model.js";
 import { isValidObjectId } from "mongoose";
 import { AppError } from "../middleware/AppError.js";
 
+const getTaskScope = (user) => user.role === "admin" ? {} : { userId: user.id };
+
 export const getAlltasks = async (req, res, next) => {
     try {
-        const tasks = await Task.find({}).populate('categoryId');
+        const tasks = await Task.find(getTaskScope(req.user)).populate('categoryId');
         res.status(200).json({
             success: true,
             data: tasks
@@ -22,7 +24,10 @@ export const getTaskById = async (req, res, next) => {
            return next(new AppError('Task not found',404));
         }
 
-        const task = await Task.findById(id).populate('categoryId');
+        const task = await Task.findOne({
+            _id: id,
+            ...getTaskScope(req.user),
+        }).populate('categoryId');
         
         if (!task) {
           return next(new AppError('Task not found',404));
@@ -36,7 +41,10 @@ export const getTaskById = async (req, res, next) => {
 
 export const createTask = async (req, res, next) => {
     try {
-        const newTask = new Task(req.body);
+        const newTask = new Task({
+            ...req.body,
+            userId: req.user.id,
+        });
         const savedTask = await newTask.save();
         
         res.status(201).json({
@@ -56,8 +64,8 @@ export const updateTask = async (req, res, next) => {
            return next(new AppError('task not found',404));
         }
 
-        const updatedTask = await Task.findByIdAndUpdate(
-            id,
+        const updatedTask = await Task.findOneAndUpdate(
+            { _id: id, ...getTaskScope(req.user) },
             req.body,
             { new: true, runValidators: true }
         );
@@ -80,7 +88,10 @@ export const deleteTask = async (req, res, next) => {
          return next(new AppError('Task not found', 404));
         }
 
-        const deletedTask = await Task.findByIdAndDelete(id);
+        const deletedTask = await Task.findOneAndDelete({
+            _id: id,
+            ...getTaskScope(req.user),
+        });
 
         if (!deletedTask) {
           return next(new AppError('Task not found', 404));
