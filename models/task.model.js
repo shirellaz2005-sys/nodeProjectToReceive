@@ -23,6 +23,11 @@ const taskSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Category', 
         required: false
+    },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
 }, {
     timestamps: true 

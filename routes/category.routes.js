@@ -1,13 +1,21 @@
 import { Router } from 'express';
 import { 
     getCategories, 
-    createCategory 
+    createCategory,
+    getCategoryById,
+    updateCategory,
+    deleteCategory
 } from '../controllers/category.controller.js';
 import { validateSchema } from '../middleware/validateJoi.middleware.js';
-import categorySchema from '../models/category.model.js'
+import { categoryValidationSchema } from "../validation/category.validation.js";
+import { auth, authorize } from "../middleware/auth.middleware.js";
 const router = Router();
 
+router.use(auth);
 router.get('/', getCategories);       
-router.post('/', validateSchema(categorySchema),createCategory);     
+router.get('/:id', getCategoryById);
+router.post('/', authorize("admin"), validateSchema(categoryValidationSchema), createCategory);
+router.put('/:id', authorize("admin"), validateSchema(categoryValidationSchema), updateCategory);
+router.delete('/:id', authorize("admin"), deleteCategory);
 
 export default router;

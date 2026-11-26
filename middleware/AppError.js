@@ -1,8 +1,8 @@
 export class AppError extends Error{
-    constructor(message,statosCode){
+    constructor(message,statusCode){
         super(message)
-        this.statusCode=statosCode;
-        this.type=statosCode>=400&&statosCode<500? 'fail':'error';
+        this.statusCode=statusCode;
+        this.type=statusCode>=400&&statusCode<500? 'fail':'error';
         Error.captureStackTrace(this,this.constructor)
     }
 }
